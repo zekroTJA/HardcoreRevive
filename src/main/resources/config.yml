@@ -7,3 +7,7 @@ reviveTimeout: 0
 
 # The radius around the death point where reviving is possible.
 reviveRadius: 16
+
+sneaksToRevive: 10
+
+sneakFuzziness: 5

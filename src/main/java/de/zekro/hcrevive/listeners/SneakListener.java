@@ -10,14 +10,21 @@ import org.bukkit.event.Listener;
 import org.bukkit.event.player.PlayerToggleSneakEvent;
 
 import java.util.List;
+import java.util.Random;
 
 public class SneakListener implements Listener {
 
     private final DeathRegister deathRegister;
     private final double sphericalRange;
+    private final int sneaksToRevive;
+    private final int sneaksFuzziness;
+
+    private int neededSneaks = -1;
 
     public SneakListener(HardcoreRevive pluginInstance, DeathRegister deathRegister) {
         this.sphericalRange = pluginInstance.getConfig().getDouble("reviveRadius", 16);
+        this.sneaksToRevive = pluginInstance.getConfig().getInt("sneaksToRevive", 10);
+        this.sneaksFuzziness = pluginInstance.getConfig().getInt("sneaksToRevive", 5);
         this.deathRegister = deathRegister;
     }
 
@@ -31,12 +38,25 @@ public class SneakListener implements Listener {
         if (entries.size() == 0)
             return;
 
-        entries.stream()
-                .filter(p -> p.getPlayer() != event.getPlayer())
-                .forEach(e -> this.revivePlayer(e.getPlayer(), event.getPlayer()));
+        if (neededSneaks == 0) {
+            entries.stream()
+                    .filter(p -> p.getPlayer() != event.getPlayer())
+                    .findFirst().ifPresent(e -> this.revivePlayer(e, event.getPlayer()));
+            neededSneaks = -1;
+            return;
+        }
+
+        if (neededSneaks == -1) {
+            Random rand = new Random();
+            int rv = rand.nextInt(sneaksFuzziness * 2);
+            neededSneaks = sneaksToRevive - sneaksFuzziness + rv;
+        }
+
+        neededSneaks--;
     }
 
-    private void revivePlayer(Player player, Player reviver) {
+    private void revivePlayer(Entry entry, Player reviver) {
+        Player player = entry.getPlayer();
         player.setGameMode(GameMode.SURVIVAL);
         player.teleport(player.getWorld().getSpawnLocation());
         player.sendMessage(
@@ -44,5 +64,7 @@ public class SneakListener implements Listener {
         player.getWorld().getPlayers().forEach(p ->
                 p.sendMessage(
                         String.format("%s got revived by %s.", player.getName(), reviver.getName())));
+
+        deathRegister.remove(entry);
     }
 }
