@@ -1,0 +1,9 @@
+# Whether to enable the plugin.
+enable: true
+
+# The timeout (in seconds) until a dead player must be revived.
+# Set this to 0 for an infinite timeout.
+reviveTimeout: 0
+
+# The radius around the death point where reviving is possible.
+reviveRadius: 16
