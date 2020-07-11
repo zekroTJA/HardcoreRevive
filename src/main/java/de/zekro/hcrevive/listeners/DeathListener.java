@@ -40,7 +40,7 @@ public class DeathListener implements Listener {
             return;
         }
 
-        Location deathLocation = player.getLocation().clone();
+        Location deathLocation = player.getLocation(); // Returns a deep copy of the players current location.
         BukkitTask particleTask = this.pluginInstance.getServer().getScheduler().runTaskTimer(this.pluginInstance, () -> {
             world.spawnParticle(Particle.CLOUD, deathLocation, 10);
         }, 0, 5);
