@@ -10,44 +10,40 @@ import java.util.stream.Collectors;
 
 public class DeathRegister {
 
-    private HardcoreRevive pliginInstance;
+    private HardcoreRevive pluginInstance;
     private ArrayList<Entry> register;
 
-    public static final int TIMER_DELAY = 60 * 20;
-
     public DeathRegister(HardcoreRevive pluginInstance) {
-        this.pliginInstance = pluginInstance;
+        this.pluginInstance = pluginInstance;
         this.register = new ArrayList<>();
-
-        this.pliginInstance.getServer().getScheduler()
-                .runTaskTimer(this.pliginInstance, this::cleanupTimer, TIMER_DELAY, TIMER_DELAY);
     }
 
     public void register(Player player, long expiresIn) {
-        long expires = expiresIn < 1 ? 0 : player.getWorld().getFullTime() + expiresIn;
-        Entry entry = new Entry(player, expires);
+        this.register(player, expiresIn, null);
+    }
+
+    public void register(Player player, long expiresIn, Runnable removeCallback) {
+        Entry entry = new Entry(player, removeCallback);
         this.register.add(entry);
+
+        if (expiresIn > 0) {
+            this.pluginInstance.getServer().getScheduler()
+                    .runTaskLater(this.pluginInstance, () -> this.remove(entry), expiresIn);
+        }
     }
 
     public List<Entry> get(Location location, double sphericalRadius) {
         return this.register.stream()
-                .filter(e -> !e.isExpired())
                 .filter(e -> this.isInRange(e.getLocation(), location, sphericalRadius))
                 .collect(Collectors.toList());
     }
 
     public void remove(Entry entry) {
         this.register.remove(entry);
+        entry.runRemoveCallback();
     }
 
     private boolean isInRange(Location loc1, Location loc2, double sphericalRadius) {
         return loc1.distance(loc2) <= sphericalRadius;
-    }
-
-    private void cleanupTimer() {
-        this.register.forEach(e -> {
-            if (e.isExpired())
-                this.remove(e);
-        });
     }
 }

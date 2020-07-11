@@ -4,11 +4,14 @@ import de.zekro.hcrevive.HardcoreRevive;
 import de.zekro.hcrevive.deathregister.DeathRegister;
 import de.zekro.hcrevive.util.TimeUtil;
 import org.bukkit.Location;
+import org.bukkit.Particle;
 import org.bukkit.World;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.entity.PlayerDeathEvent;
+import org.bukkit.scheduler.BukkitTask;
+
 import java.util.logging.Logger;
 import java.util.logging.Level;
 
@@ -32,12 +35,17 @@ public class DeathListener implements Listener {
         Player player = event.getEntity();
         World world = player.getWorld();
 
-        if (world.getPlayers().size() < 2) {
+        if (world.getPlayers().size() < 2) { // TODO: Re-enable
             player.sendMessage("Sorry, you are the only player on the server, so you can not be revived. :(");
             return;
         }
 
-        this.deathRegister.register(player, reviveTimeout * 20);
+        Location deathLocation = player.getLocation().clone();
+        BukkitTask particleTask = this.pluginInstance.getServer().getScheduler().runTaskTimer(this.pluginInstance, () -> {
+            world.spawnParticle(Particle.CLOUD, deathLocation, 10);
+        }, 0, 5);
+
+        this.deathRegister.register(player, reviveTimeout * 20, particleTask::cancel);
 
         world.getPlayers().stream()
                 .filter(p -> p != player)

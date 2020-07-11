@@ -8,24 +8,33 @@ public class Entry {
     private Player player;
     private Location location;
     private World world;
-    private long expires;
+    private Runnable removeCallback;
 
-    public Entry(Player player, long expires) {
+    public Entry(Player player) {
+        this(player, null);
+    }
+
+    public Entry(Player player, Runnable removeCallback) {
         this.player = player;
+        this.removeCallback = removeCallback;
         this.world = player.getWorld();
         this.location = player.getLocation();
-        this.expires = expires;
     }
 
     public Player getPlayer() {
         return player;
     }
 
+    public World getWorld() {
+        return this.world;
+    }
+
     public Location getLocation() {
         return location;
     }
 
-    public boolean isExpired() {
-        return this.expires > 0 && this.player.getWorld().getFullTime() > this.expires;
+    public void runRemoveCallback() {
+        if (this.removeCallback != null)
+            this.removeCallback.run();
     }
-}
+ }

@@ -40,7 +40,7 @@ public class SneakListener implements Listener {
 
         if (neededSneaks == 0) {
             entries.stream()
-                    .filter(p -> p.getPlayer() != event.getPlayer())
+                    .filter(p -> p.getPlayer() != event.getPlayer()) // TODO: Re-enable
                     .findFirst().ifPresent(e -> this.revivePlayer(e, event.getPlayer()));
             neededSneaks = -1;
             return;
