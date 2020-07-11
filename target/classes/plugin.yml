@@ -1,8 +1,0 @@
-name: HardcoreRevive
-version: 1.0-SNAPSHOT
-main: de.zekro.hcrevive.HardcoreRevive
-api-version: 1.13
-prefix: HCREVIVE
-authors: [zekro]
-description: Revive people in hardcore mode.
-website: https://zekro.de

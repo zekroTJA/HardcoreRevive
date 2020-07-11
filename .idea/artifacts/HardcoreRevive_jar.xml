@@ -1,8 +1,0 @@
-<component name="ArtifactManager">
-  <artifact type="jar" name="HardcoreRevive:jar">
-    <output-path>$PROJECT_DIR$/../dev-paper-server/plugins</output-path>
-    <root id="archive" name="HardcoreRevive.jar">
-      <element id="module-output" name="HardcoreRevive" />
-    </root>
-  </artifact>
-</component>
