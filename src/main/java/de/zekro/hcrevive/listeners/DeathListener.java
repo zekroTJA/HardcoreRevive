@@ -65,8 +65,7 @@ public class DeathListener implements Listener {
         Location deathLocation = player.getLocation();
         BukkitTask particleTask = this.pluginInstance.getServer().getScheduler()
                 .runTaskTimer(this.pluginInstance, () ->
-                    world.spawnParticle(Particle.CLOUD, deathLocation,
-                            10, 2, 2, 2, 0),0, 5);
+                        this.spawnDeathLocationParticles(world, deathLocation),0, 5);
 
         this.deathRegister.register(player, reviveTimeout * 20, particleTask::cancel);
 
@@ -77,7 +76,7 @@ public class DeathListener implements Listener {
         player.sendMessage(this.getDeathVictimMessage());
 
         this.logger.log(Level.INFO, String.format(
-                "Player %s died in world %s", player.getName(), WorldUtil.getName(world)));
+                "Player %s died in %s", player.getName(), WorldUtil.getName(world)));
     }
 
     /**
@@ -122,5 +121,13 @@ public class DeathListener implements Listener {
         }
 
         return res.toString();
+    }
+
+    private void spawnDeathLocationParticles(World world, Location location) {
+        world.spawnParticle(Particle.CLOUD, location,10, 2, 2, 2, 0);
+        for (int i = 0; i < 25; i++) {
+            world.spawnParticle(Particle.END_ROD, location.getX(), i * 10, location.getZ(),
+                    10, 0, 10, 0, 0);
+        }
     }
 }
