@@ -15,6 +15,13 @@ import org.bukkit.scheduler.BukkitTask;
 import java.util.logging.Logger;
 import java.util.logging.Level;
 
+/**
+ * Listener class binding the {@link PlayerDeathEvent}.
+ *
+ * When a player dies and another player is on the server,
+ * the death is registered with the death location to be
+ * revived by another player.
+ */
 public class DeathListener implements Listener {
 
     private final HardcoreRevive pluginInstance;
@@ -22,6 +29,12 @@ public class DeathListener implements Listener {
     private final Logger logger;
     private final int reviveTimeout;
 
+    /**
+     * Initializes an ew instance of {@link DeathListener}.
+     * @param pluginInstance The plugin instance
+     * @param deathRegister The death register instance.
+     * @param logger The logger instance.
+     */
     public DeathListener(HardcoreRevive pluginInstance, DeathRegister deathRegister, Logger logger) {
         this.pluginInstance = pluginInstance;
         this.deathRegister = deathRegister;
@@ -30,12 +43,18 @@ public class DeathListener implements Listener {
         this.reviveTimeout = this.pluginInstance.getConfig().getInt("reviveTimeout", 0);
     }
 
+    /**
+     * {@link PlayerDeathEvent} event listener.
+     * @param event player death event
+     */
     @EventHandler
     public void onDeath(PlayerDeathEvent event) {
         Player player = event.getEntity();
         World world = player.getWorld();
 
-        if (world.getPlayers().size() < 2) { // TODO: Re-enable
+        // Don't continue when less than two players are on the server.
+        // TODO: Make this configurable.
+        if (world.getPlayers().size() < 2) {
             player.sendMessage("Sorry, you are the only player on the server, so you can not be revived. :(");
             return;
         }
@@ -56,12 +75,19 @@ public class DeathListener implements Listener {
         this.logger.log(Level.INFO, String.format("Player %s died in world %s", player.getName(), world.getName()));
     }
 
-    private String getDeathBroadcastMessage(Player player) {
+    /**
+     * Returns a message sent to all other players on the server to indicate
+     * where the player died to be revived.
+     * If a timeout is specified, this will be given as well in the message.
+     * @param victim dead player
+     * @return formatted message
+     */
+    private String getDeathBroadcastMessage(Player victim) {
         StringBuilder res = new StringBuilder();
-        Location loc = player.getLocation();
+        Location loc = victim.getLocation();
 
         res.append(String.format("%s died at %d/%d/%d!",
-                player.getName(), loc.getBlockX(), loc.getBlockY(), loc.getBlockZ()));
+                victim.getName(), loc.getBlockX(), loc.getBlockY(), loc.getBlockZ()));
 
         if (this.reviveTimeout > 0) {
             res.append(String.format(" You have %s to reach this location.",
@@ -73,6 +99,12 @@ public class DeathListener implements Listener {
         return res.toString();
     }
 
+    /**
+     * Message which is sent to the player died.
+     * If a timeout is specified, the time until that will be
+     * displayed as well.
+     * @return Formatted message.
+     */
     private String getDeathVictimMessage() {
         StringBuilder res = new StringBuilder();
 

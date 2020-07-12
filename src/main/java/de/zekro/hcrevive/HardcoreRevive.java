@@ -5,7 +5,6 @@ import de.zekro.hcrevive.listeners.DeathListener;
 import de.zekro.hcrevive.listeners.SneakListener;
 import org.bukkit.plugin.PluginManager;
 import org.bukkit.plugin.java.JavaPlugin;
-
 import java.util.logging.Level;
 
 public final class HardcoreRevive extends JavaPlugin {
@@ -16,17 +15,19 @@ public final class HardcoreRevive extends JavaPlugin {
     public void onEnable() {
         this.saveDefaultConfig();
 
+        if (!this.getConfig().getBoolean("enable", true)) {
+            this.getLogger().log(Level.WARNING, "disabled by config");
+            return;
+        }
+
         if (!this.getServer().isHardcore()) {
-            this.getLogger().log(Level.SEVERE, "HardcoreRevive is disabled when server is not in hardcore mode");
-            this.onDisable();
+            this.getLogger().log(Level.WARNING, "disabled when server is not in hardcore mode");
             return;
         }
 
         this.deathRegister = new DeathRegister(this);
 
-        if (this.getConfig().getBoolean("enable", true)) {
-            this.registerListeners();
-        }
+        this.registerListeners();
     }
 
     @Override

@@ -1,7 +1,17 @@
 package de.zekro.hcrevive.util;
 
+/**
+ * Some utility functions for times and
+ * time spans.
+ */
 public class TimeUtil {
 
+    /**
+     * Parses the passed totalSeconds to a time span string
+     * in the format of '[[h hours] m minutes] s seconds'.
+     * @param totalSeconds amount of total seconds
+     * @return the parsed string
+     */
     public static String getFormattedTimeSpan(int totalSeconds) {
         int hours = (int) Math.floor(totalSeconds / 60F / 60F);
         int minutes = (int) Math.floor(totalSeconds % 60 / 60F);

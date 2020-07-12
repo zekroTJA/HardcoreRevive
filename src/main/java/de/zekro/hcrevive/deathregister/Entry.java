@@ -4,6 +4,8 @@ import org.bukkit.Location;
 import org.bukkit.World;
 import org.bukkit.entity.Player;
 
+// TODO: Docs
+
 public class Entry {
     private Player player;
     private Location location;

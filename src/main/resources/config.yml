@@ -1,13 +1,29 @@
 # Whether to enable the plugin.
+# Default: true
 enable: true
 
 # The timeout (in seconds) until a dead player must be revived.
-# Set this to 0 for an infinite timeout.
+# Set this to '0' for an infinite timeout.
+# Default: 0
 reviveTimeout: 0
 
 # The radius around the death point where reviving is possible.
+# Default: 16
 reviveRadius: 16
 
+# Average amount of sneaks needed to revive a death player.
+# Default: 10
 sneaksToRevive: 10
 
+# ± amount of sneaks needed which deviates randomly from the
+# set average amount of needed sneaks to revive a player.
+# Set this to '0' to fix the value with no random fuzziness.
+# Default: 5
 sneakFuzziness: 5
+
+# Whether to revive player at position where they died.
+# Otherwise, if this is set to 'false', the player is
+# respawned either at the bed's position or, when this
+# is not set, at the world spawn point.
+# Default: true
+reviveAtDeathPosition: true

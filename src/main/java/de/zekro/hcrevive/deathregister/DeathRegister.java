@@ -8,6 +8,8 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 
+// TODO: Docs
+
 public class DeathRegister {
 
     private HardcoreRevive pluginInstance;
