@@ -57,22 +57,31 @@ public class DeathListener implements Listener {
         Player player = event.getEntity();
         World world = player.getWorld();
 
+        // When 'registerWhenAlone' is set to false and
+        // less than 2 players are on the server, disable death
+        // recording for reviving.
         if (!registerWhenAlone && world.getPlayers().size() < 2) {
             player.sendMessage("Sorry, you are the only player on the server, so you can not be revived. :(");
             return;
         }
 
+        // Get location and schedule loop to spawn death location particles.
         Location deathLocation = player.getLocation();
         BukkitTask particleTask = this.pluginInstance.getServer().getScheduler()
                 .runTaskTimer(this.pluginInstance, () ->
                         this.spawnDeathLocationParticles(world, deathLocation),0, 5);
 
+        // Register the death in the death register with the particleTask
+        // cancel function as remove/expire callback.
         this.deathRegister.register(player, reviveTimeout * 20, particleTask::cancel);
 
+        // Broadcast a message to all players which are not the death victim
+        // to signal the victims player death.
         world.getPlayers().stream()
                 .filter(p -> p != player)
                 .forEach(p -> p.sendMessage(this.getDeathBroadcastMessage(player)));
 
+        // Send a message to the death victim.
         player.sendMessage(this.getDeathVictimMessage());
 
         this.logger.log(Level.INFO, String.format(
@@ -123,6 +132,13 @@ public class DeathListener implements Listener {
         return res.toString();
     }
 
+    /**
+     * Spawn particles at the death location.
+     * This spawns a cloud at the exact death point and a beam of
+     * particles from Y: 0 to Y: 250 at the death location.
+     * @param world the world object
+     * @param location the location where the particles are spawned
+     */
     private void spawnDeathLocationParticles(World world, Location location) {
         world.spawnParticle(Particle.CLOUD, location,10, 2, 2, 2, 0);
         for (int i = 0; i < 25; i++) {
