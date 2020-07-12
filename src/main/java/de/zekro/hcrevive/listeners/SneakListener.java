@@ -9,7 +9,6 @@ import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.player.PlayerToggleSneakEvent;
-
 import java.util.List;
 import java.util.Random;
 
@@ -23,10 +22,13 @@ import java.util.Random;
 public class SneakListener implements Listener {
 
     private final DeathRegister deathRegister;
+
+    // --- CONFIG VALUES -------------------------
     private final double sphericalRange;
     private final int sneaksToRevive;
     private final int sneaksFuzziness;
     private final boolean reviveAtDeathPosition;
+    // -------------------------------------------
 
     private int neededSneaks = -1;
 
@@ -48,7 +50,7 @@ public class SneakListener implements Listener {
      * @param event player toggle sneak event
      */
     @EventHandler
-    public void onSneak(PlayerToggleSneakEvent event) {
+    void onSneak(PlayerToggleSneakEvent event) {
         // Only continue if started sneaking.
         if (!event.isSneaking())
             return;

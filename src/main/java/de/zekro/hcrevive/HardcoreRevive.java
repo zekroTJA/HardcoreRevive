@@ -1,10 +1,14 @@
 package de.zekro.hcrevive;
 
+import de.zekro.hcrevive.commands.FlushRegister;
 import de.zekro.hcrevive.deathregister.DeathRegister;
 import de.zekro.hcrevive.listeners.DeathListener;
+import de.zekro.hcrevive.listeners.QuitListener;
 import de.zekro.hcrevive.listeners.SneakListener;
 import org.bukkit.plugin.PluginManager;
 import org.bukkit.plugin.java.JavaPlugin;
+
+import java.util.Objects;
 import java.util.logging.Level;
 
 public final class HardcoreRevive extends JavaPlugin {
@@ -28,6 +32,7 @@ public final class HardcoreRevive extends JavaPlugin {
         this.deathRegister = new DeathRegister(this);
 
         this.registerListeners();
+        this.registerCommands();
     }
 
     @Override
@@ -40,5 +45,11 @@ public final class HardcoreRevive extends JavaPlugin {
 
         pm.registerEvents(new DeathListener(this, this.deathRegister, this.getLogger()), this);
         pm.registerEvents(new SneakListener(this, this.deathRegister), this);
+        pm.registerEvents(new QuitListener(this.deathRegister), this);
+    }
+
+    private void registerCommands() {
+        Objects.requireNonNull(this.getCommand("hcrvFlushRegister"))
+                .setExecutor(new FlushRegister(this.deathRegister));
     }
 }

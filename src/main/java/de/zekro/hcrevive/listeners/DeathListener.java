@@ -3,6 +3,7 @@ package de.zekro.hcrevive.listeners;
 import de.zekro.hcrevive.HardcoreRevive;
 import de.zekro.hcrevive.deathregister.DeathRegister;
 import de.zekro.hcrevive.util.TimeUtil;
+import de.zekro.hcrevive.util.WorldUtil;
 import org.bukkit.Location;
 import org.bukkit.Particle;
 import org.bukkit.World;
@@ -11,7 +12,6 @@ import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.entity.PlayerDeathEvent;
 import org.bukkit.scheduler.BukkitTask;
-
 import java.util.logging.Logger;
 import java.util.logging.Level;
 
@@ -27,7 +27,11 @@ public class DeathListener implements Listener {
     private final HardcoreRevive pluginInstance;
     private final DeathRegister deathRegister;
     private final Logger logger;
+
+    // --- CONFIG VALUES -----------------------
     private final int reviveTimeout;
+    private final boolean registerWhenAlone;
+    // -----------------------------------------
 
     /**
      * Initializes an ew instance of {@link DeathListener}.
@@ -41,6 +45,7 @@ public class DeathListener implements Listener {
         this.logger = logger;
 
         this.reviveTimeout = this.pluginInstance.getConfig().getInt("reviveTimeout", 0);
+        this.registerWhenAlone = this.pluginInstance.getConfig().getBoolean("registerWhenAlone", true);
     }
 
     /**
@@ -48,21 +53,20 @@ public class DeathListener implements Listener {
      * @param event player death event
      */
     @EventHandler
-    public void onDeath(PlayerDeathEvent event) {
+    void onDeath(PlayerDeathEvent event) {
         Player player = event.getEntity();
         World world = player.getWorld();
 
-        // Don't continue when less than two players are on the server.
-        // TODO: Make this configurable.
-        if (world.getPlayers().size() < 2) {
+        if (!registerWhenAlone && world.getPlayers().size() < 2) {
             player.sendMessage("Sorry, you are the only player on the server, so you can not be revived. :(");
             return;
         }
 
-        Location deathLocation = player.getLocation(); // Returns a deep copy of the players current location.
-        BukkitTask particleTask = this.pluginInstance.getServer().getScheduler().runTaskTimer(this.pluginInstance, () -> {
-            world.spawnParticle(Particle.CLOUD, deathLocation, 10);
-        }, 0, 5);
+        Location deathLocation = player.getLocation();
+        BukkitTask particleTask = this.pluginInstance.getServer().getScheduler()
+                .runTaskTimer(this.pluginInstance, () ->
+                    world.spawnParticle(Particle.CLOUD, deathLocation,
+                            10, 2, 2, 2, 0),0, 5);
 
         this.deathRegister.register(player, reviveTimeout * 20, particleTask::cancel);
 
@@ -72,7 +76,8 @@ public class DeathListener implements Listener {
 
         player.sendMessage(this.getDeathVictimMessage());
 
-        this.logger.log(Level.INFO, String.format("Player %s died in world %s", player.getName(), world.getName()));
+        this.logger.log(Level.INFO, String.format(
+                "Player %s died in world %s", player.getName(), WorldUtil.getName(world)));
     }
 
     /**
@@ -86,8 +91,9 @@ public class DeathListener implements Listener {
         StringBuilder res = new StringBuilder();
         Location loc = victim.getLocation();
 
-        res.append(String.format("%s died at %d/%d/%d!",
-                victim.getName(), loc.getBlockX(), loc.getBlockY(), loc.getBlockZ()));
+        res.append(String.format("%s died at %d/%d/%d in %s!",
+                victim.getName(), loc.getBlockX(), loc.getBlockY(), loc.getBlockZ(),
+                WorldUtil.getName(victim.getWorld())));
 
         if (this.reviveTimeout > 0) {
             res.append(String.format(" You have %s to reach this location.",

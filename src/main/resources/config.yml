@@ -2,6 +2,12 @@
 # Default: true
 enable: true
 
+# Also register a death when no other player is on the server
+# currently. When a player joins in time, the player will be
+# able to revive the victim.
+# Default: true
+registerWhenAlone: true
+
 # The timeout (in seconds) until a dead player must be revived.
 # Set this to '0' for an infinite timeout.
 # Default: 0

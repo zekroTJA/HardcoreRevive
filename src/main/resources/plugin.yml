@@ -6,3 +6,9 @@ prefix: HCREVIVE
 authors: [zekro]
 description: Revive people in hardcore mode.
 website: https://github.com/zekroTJA/HardcoreRevive
+
+commands:
+  hcrvFlushRegister:
+    description: Flush the death register.
+    usage: /hcrvFlushRegister
+    permission: hcrevive.flushRegister
